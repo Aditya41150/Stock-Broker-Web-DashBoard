@@ -20,7 +20,7 @@ A beautiful, real-time stock tracking web application built with vanilla JavaScr
 
 ## 🚀 Demo
 
--> https://stock-broker-web-dashboard.netlify.app/
+-> https://aditya41150.github.io/Stock-Broker-Web-DashBoard/
 
 ## 🛠️ Technologies Used
 
