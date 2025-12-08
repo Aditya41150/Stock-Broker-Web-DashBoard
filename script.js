@@ -13,10 +13,39 @@ let prices = {};
 let history = {};
 let chartObjs = {};
 let timer = null;
+let isMaster = false;
 
-stocks.forEach(ticker => {
-    prices[ticker] = stockData[ticker].basePrice;
-});
+function initPrices() {
+    const stored = localStorage.getItem('globalPrices');
+    if (stored) {
+        prices = JSON.parse(stored);
+    } else {
+        stocks.forEach(ticker => {
+            prices[ticker] = stockData[ticker].basePrice;
+        });
+        localStorage.setItem('globalPrices', JSON.stringify(prices));
+    }
+}
+
+function checkMaster() {
+    const masterTimestamp = localStorage.getItem('masterTimestamp');
+    const now = Date.now();
+    
+    if (!masterTimestamp || now - parseInt(masterTimestamp) > 2000) {
+        isMaster = true;
+        localStorage.setItem('masterTimestamp', now.toString());
+        return true;
+    }
+    return false;
+}
+
+function keepMasterAlive() {
+    if (isMaster) {
+        localStorage.setItem('masterTimestamp', Date.now().toString());
+    }
+}
+
+initPrices();
 
 function login() {
     const email = document.getElementById('email').value.trim();
@@ -32,6 +61,7 @@ function login() {
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
         
+        checkMaster();
         renderStocks();
         startUpdates();
     }
@@ -43,6 +73,12 @@ function logout() {
     }
     
     stopUpdates();
+    
+    if (isMaster) {
+        isMaster = false;
+        localStorage.removeItem('masterTimestamp');
+    }
+    
     user = null;
     subs = [];
     history = {};
@@ -55,10 +91,25 @@ function logout() {
 
 function startUpdates() {
     timer = setInterval(() => {
-        Object.keys(prices).forEach(ticker => {
-            const change = (Math.random() - 0.5) * 10;
-            prices[ticker] = Math.max(1, prices[ticker] + change);
-        });
+        const wasMaster = isMaster;
+        checkMaster();
+        
+        if (isMaster) {
+            Object.keys(prices).forEach(ticker => {
+                const change = (Math.random() - 0.5) * 10;
+                prices[ticker] = Math.max(1, prices[ticker] + change);
+            });
+            
+            localStorage.setItem('globalPrices', JSON.stringify(prices));
+            localStorage.setItem('pricesUpdated', Date.now().toString());
+            
+            keepMasterAlive();
+        } else {
+            const stored = localStorage.getItem('globalPrices');
+            if (stored) {
+                prices = JSON.parse(stored);
+            }
+        }
 
         subs.forEach(ticker => {
             if (!history[ticker]) {
@@ -83,6 +134,13 @@ function stopUpdates() {
         timer = null;
     }
 }
+
+window.addEventListener('storage', (e) => {
+    if (e.key === 'globalPrices' && !isMaster) {
+        prices = JSON.parse(e.newValue);
+        updateDisplay();
+    }
+});
 
 function openModal() {
     const modal = document.getElementById('modal');

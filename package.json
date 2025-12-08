@@ -1,0 +1,24 @@
+{
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "name": "stock-broker-dashboard",
+  "version": "1.0.0",
+  "description": "A beautiful, real-time stock tracking web application built with vanilla JavaScript. Monitor multiple stocks simultaneously with live price updates and interactive charts.",
+  "main": "script.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aditya41150/Stock-Broker-Web-DashBoard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Aditya41150/Stock-Broker-Web-DashBoard/issues"
+  },
+  "homepage": "https://github.com/Aditya41150/Stock-Broker-Web-DashBoard#readme"
+}
